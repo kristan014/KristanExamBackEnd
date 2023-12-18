@@ -71,7 +71,7 @@ public class UserService {
         boolean exists = userRepo.existsById(userId);
 
         if (!exists) {
-            throw new IllegalStateException("student with the id of " + userId + "does not exists");
+            throw new IllegalStateException("user with the id of " + userId + "does not exists");
         }
         userRepo.deleteById(userId);
     }
