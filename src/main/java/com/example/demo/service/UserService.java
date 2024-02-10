@@ -3,70 +3,82 @@ package com.example.demo.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.example.demo.repo.UserRepo;
+import com.example.demo.util.FindUniqueItems;
 
 import jakarta.transaction.Transactional;
 
+import com.example.demo.dto.UserDto;
 import com.example.demo.model.User;
 
 @Service
 public class UserService {
 
     @Autowired
-    private final UserRepo userRepo;
+    private UserRepo userRepo;
 
-    public UserService(UserRepo userRepo) {
-        this.userRepo = userRepo;
+    // get all contaning keyword of firstname and lastname
+    public List<User> getNames(String keyword) {
+
+        List<User> result = new ArrayList<>();
+
+        // add all containing firstnames to created list
+        List<User> firstNames = userRepo.findByFirstNameStartingWithIgnoreCase(keyword);
+        result.addAll(firstNames);
+
+        // add all containing lastnames to created list
+        List<User> laststNames = userRepo.findByLastNameStartingWithIgnoreCase(keyword);
+        result.addAll(laststNames);
+
+        List<User> uniqueItems = FindUniqueItems.findUniqueItems(result);
+
+        return uniqueItems;
     }
 
-    // Get All
+    // get all
     public List<User> getUsers() {
-
-        return userRepo.findAll();
+        return userRepo.findByOrderByIdAsc();
     }
 
+    // create
+    public void addNewUser(UserDto userDto) {
+        User userEmail = userRepo.findUserByEmail(userDto.getEmail());
+        User userMobileNumber = userRepo.findUserByMobileNumber(userDto.getMobileNumber());
 
-    // Create
-    public void addNewUser(User user) {
-        Optional<User> userEmail = userRepo.findUserByEmail(user.getEmail());
-        Optional<User> userMobileNumber = userRepo.findUserByEmail(user.getMobileNUmber());
+        User user = convertToUser(userDto);
 
-
-        if (userEmail.isPresent()) {
-            throw new IllegalStateException("email taken");
+        if (userEmail != null) {
+            throw new IllegalStateException("Email taken");
         }
 
-        if (userMobileNumber.isPresent()) {
-            throw new IllegalStateException("mobile number taken");
+        if (userMobileNumber != null) {
+            throw new IllegalStateException("Mobile number taken");
         }
 
-        System.out.print(user);
         userRepo.save(user);
 
     }
 
-  // Update
+    // update
     @Transactional
-       public void updateUser(Long userId, User user) {
+    public void updateUser(Long userId, UserDto userDto) {
 
         User _user = userRepo.findById(userId).orElseThrow(
                 () -> new IllegalStateException("user with the id of " + userId + "does not exists"));
-        
-            
-        _user.setFirstName(user.getFirstName());
-        _user.setMiddleName(user.getMiddleName());
-        _user.setLastName(user.getLastName());
-        _user.setEmail(user.getEmail());
-        _user.setMobileNumber(user.getMobileNUmber());
 
+        _user.setFirstName(userDto.getFirstName());
+        _user.setMiddleName(userDto.getMiddleName());
+        _user.setLastName(userDto.getLastName());
+        _user.setEmail(userDto.getEmail());
+        _user.setMobileNumber(userDto.getMobileNumber());
 
-        userRepo.save(user);
+        userRepo.save(_user);
     }
 
-    // Delete By
+    // delete By id
     public void deleteUser(Long userId) {
         boolean exists = userRepo.existsById(userId);
 
@@ -76,8 +88,31 @@ public class UserService {
         userRepo.deleteById(userId);
     }
 
-    //Find One
+    // find one by id
     public Object getUser(Long id) {
-            return userRepo.findById(id);
+        return userRepo.findById(id);
     }
+
+    // find one by email
+    public List<User> getUserByEmailAndIdNot(String email, Long id) {
+        return userRepo.findByEmailWhereIdNotEqual(email, id);
+    }
+
+    // find one by mobile number
+    public List<User> getUserByMobileNumberAndIdNot(String mobileNumber, Long id) {
+        return userRepo.findByMobileNumberWhereIdNotEqual(mobileNumber, id);
+    }
+
+    // convert dto to entity
+    private User convertToUser(UserDto userDto) {
+        User user = new User();
+        user.setFirstName(userDto.getFirstName());
+        user.setMiddleName(userDto.getMiddleName());
+        user.setLastName(userDto.getLastName());
+        user.setEmail(userDto.getEmail());
+        user.setMobileNumber(userDto.getMobileNumber());
+
+        return user;
+    }
+
 }

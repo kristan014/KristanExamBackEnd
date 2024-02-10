@@ -1,39 +1,34 @@
-package com.example.demo.model;
+package com.example.demo.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import com.example.demo.util.Constants;
 
-@Entity
-@Table(name = "users")
-public class User {
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
-    @Id
-    @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
+public class UserDto {
+
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank
     private String firstName;
-
     private String middleName;
-
-    @Column(nullable = false)
+    @NotBlank
     private String lastName;
 
-    @Column(unique = true,nullable = false)
-    private String mobileNumber;
-
-    @Column(unique = true,nullable = false)
+    @NotBlank
+    @Email(message = "Please provide a valid email address")
+    @Pattern(regexp = Constants.EMAIL_REGEX, message = "Enter email in valid format")
     private String email;
 
-    public User(){}
+    @NotBlank
+    @Pattern(regexp = Constants.MOBILE_NUMBER_REGEX, message = "Must have valid format with country code e.g. +639270001234")
+    private String mobileNumber;
 
-    public User(
+    public UserDto() {
+    }
+
+    public UserDto(
             Long id,
             String firstName,
             String middleName,
@@ -49,7 +44,7 @@ public class User {
 
     }
 
-        public User(
+    public UserDto(
             String firstName,
             String middleName,
             String lastName,
@@ -71,23 +66,6 @@ public class User {
         this.id = id;
     }
 
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getMobileNumber() {
-        return mobileNumber;
-    }
-
-    public void setMobileNumber(String mobileNumber) {
-        this.mobileNumber = mobileNumber;
-    }
-
     public String getFirstName() {
         return firstName;
     }
@@ -104,7 +82,6 @@ public class User {
         this.middleName = middleName;
     }
 
-
     public String getLastName() {
         return lastName;
     }
@@ -113,6 +90,20 @@ public class User {
         this.lastName = lastName;
     }
 
+    public String getEmail() {
+        return email;
+    }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
+    }
 
 }

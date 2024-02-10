@@ -19,7 +19,7 @@ public class UserConfig {
                     "Kristan",
                     "Diaz",
                     "Balin",
-                    "091231231",
+                    "+632700011223",
                     "kristanbalin@gmail.com"
 
                     );
@@ -28,7 +28,7 @@ public class UserConfig {
                     "Kristan2",
                     "Diaz",
                     "Balin",
-                    "091231231411",
+                    "+632100011223",
                     "kristanbalin2@gmail.com"
 
                     );                    
